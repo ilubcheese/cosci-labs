@@ -1,0 +1,125 @@
+//Alex Coronado
+//Lab: 6
+
+#include <iostream>
+#include <string>
+#include <fstream>	
+#include <iomanip>
+
+using namespace std;
+
+const double deluxe = 25.80;
+const double standard = 21.75;
+const double childrate = .4;
+const double surchargeRate = .07;
+const double taxNtipRate = .18;
+void validation(ifstream &infile, int &party, int &adults, int& children, char &meal, char& weekend, double &deposit);
+double mealtotal(double& mealcostA, double& mealcostC, char meal, int adults, int children);
+void additionalCost(double totalM, char weekend, double & taxNtip, double &surcharge, double& totalcost);
+bool Billfunc(int party, int adults, int children, char meal, char weekend, double deposit, double mealcostA, double mealcostC, double totalM, double taxNtip, double surcharge, double totalcost, bool nextline);
+
+int main() {
+	ifstream infile;
+	ofstream outfile;
+	int party;
+	int adults;
+	int children;
+	char meal;
+	char weekend;
+	double deposit;
+	double totalM;
+	int counter;
+	double taxNtip;
+	double totalcost;
+	double surcharge=0;
+	double mealcostA;
+	double mealcostC;
+	bool nextline = true;
+	
+	infile.open("C:\\Users\\\cynthia hernandez\\Documents\\partydatafile.txt");
+	if (!infile)
+	{
+	cout << "Cannot open the file.";
+	system("pause");
+	}
+	outfile.open("C:\\Users\\cynthia hernandez\\Documents\\newfile.txt");
+	
+	while(!infile.eof()) { 
+																
+		validation(infile, party, adults, children, meal, weekend, deposit);
+		totalM= mealtotal(mealcostA, mealcostC,meal, adults, children);
+		additionalCost(totalM, weekend, taxNtip,surcharge,totalcost);
+		Billfunc(party,adults,children, meal, weekend, deposit, mealcostA, mealcostC, totalM, taxNtip,  surcharge,  totalcost, nextline);
+
+	}
+	infile.close();
+	outfile.close();
+	system("pause");
+	return 0;
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+void validation(ifstream &infile, int &party, int &adults, int &children, char& meal, char &weekend, double &deposit)
+{
+	cout << "Enter data" << endl;
+	infile >> party >> adults >> children >> meal >> weekend >> deposit;
+
+	if (cin.fail() || party <=0){
+		cout<< "Error: party I.D. must be a number and can not be negative." << endl;
+	}
+	if(cin.fail() || adults < 0){
+		cout << "Error: adults must be a number and can not be negative." << endl;
+	}
+	if(cin.fail() || children < 0){
+		cout << "Error: children must be a number and can not be negative." << endl;	
+	}
+	if (cin.fail() || !(meal == 'S' || meal == 'D')){
+		cout << "Error: Meal plan must be  'S' or 'D'." << endl;
+	}
+	if (cin.fail() || !(weekend == 'Y' || weekend == 'N')){
+		cout << "Error: Weekend must be answered with Y/N." << endl;
+	}
+	if (cin.fail() || deposit < 0){
+		cout << " Error: Deposit must be a number and can not be negative." << endl;
+	}
+}
+
+double mealtotal(double& mealcostA, double& mealcostC, char meal, int adults, int children){
+	if (meal == 'D') {
+		mealcostA = deluxe * adults;
+		mealcostC = deluxe * children;
+		mealcostC = mealcostC * childrate;
+		return mealcostC + mealcostA;	
+	}
+	if (meal == 'S') {
+		mealcostA = standard * adults;
+		mealcostC = standard * children;
+		mealcostC = mealcostC * childrate;
+		return mealcostC + mealcostA;
+	}
+}					
+//********************************************************************************************************************************************
+void additionalCost(double totalM, char weekend, double & taxNtip, double &surcharge, double &totalcost) {
+
+	taxNtip = totalM * taxNtipRate;
+	totalcost = totalM + taxNtip;
+	
+	if (weekend == 'Y') {
+		surcharge = totalcost * surchargeRate;
+		totalcost = totalcost + surcharge;
+	}
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+bool Billfunc(int party, int adults, int children, char meal, char weekend, double deposit, double mealcostA, double mealcostC ,double totalM, double taxNtip, double surcharge, double totalcost, bool nextline) {
+
+	cout << "Party #" << party << "\tAdults " << adults << "\tChildren: " << children << "\tMeal type: " << meal << "\tWeekend: " << weekend << "\tDeposit " << deposit << endl << endl;
+
+	cout << fixed << showpoint << setprecision(2);
+	cout << "Adult meals:     " << mealcostA << endl;
+	cout << "Children meals:  " << mealcostC << endl;
+	cout << "Meal cost:       " << totalM << endl;
+	cout << "tax/tip:         " << taxNtip << endl;
+	cout << "Surcharge:       " << surcharge << endl;
+	cout << "Total bill:      " << totalcost << endl;
+	return nextline;
+}
